@@ -9,18 +9,17 @@ cache:
     - "$HOME/.pyenv"
 matrix:
   include:
-    - python: 3.6
-    - python: 3.7
-    - python: pypy3
-      dist: trusty
-    - python: 3.7
+    - name: "Python 3.6 Unit-test"
+      python: 3.6
+    - name: "Python 3.7 Unit-test"
+      python: 3.7
+    - name: "Python 3.7 Docker Unit and Integration-test"
+      python: 3.7
       services:
         - docker
       env:
         - BUILD_SDIST=true
         - INTEGRATION_TEST=true
-  allow_failures:
-    - python: pypy3
 
 install:
   - pip install -e . -r requirements.txt -r requirements-tests.txt
