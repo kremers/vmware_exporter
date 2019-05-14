@@ -526,19 +526,19 @@ def test_collect_deferred_error_works():
 
 @pytest_twisted.inlineCallbacks
 def test_vmware_get_inventory():
-    content = mock.Mock()
+    content = mock.Mock(spec=vim.ServiceInstanceContent)
 
     # Compute case 1
-    host_1 = mock.Mock()
+    host_1 = mock.Mock(spec=vim.HostSystem)
     host_1._moId = 'host:1'
     host_1.name = 'host-1'
     host_1.summary.config.name = 'host-1.'
 
-    folder_1 = mock.Mock()
+    folder_1 = mock.Mock(spec=vim.ComputeResource)
     folder_1.host = [host_1]
 
     # Computer case 2
-    host_2 = mock.Mock()
+    host_2 = mock.Mock(spec=vim.HostSystem)
     host_2._moId = 'host:2'
     host_2.name = 'host-2'
     host_2.summary.config.name = 'host-2.'
@@ -548,12 +548,12 @@ def test_vmware_get_inventory():
     folder_2.__dict__['host'] = [host_2]
 
     # Folders case
-    host_3 = mock.Mock()
+    host_3 = mock.Mock(spec=vim.HostSystem)
     host_3._moId = 'host:3'
     host_3.name = 'host-3'
     host_3.summary.config.name = 'host-3.'
 
-    folder_3 = mock.Mock()
+    folder_3 = mock.Mock(spec=vim.ComputeResource)
     folder_3.host = [host_3]
 
     folder_4 = vim.Folder('folder:4')
@@ -576,12 +576,20 @@ def test_vmware_get_inventory():
     datastore_2_folder.__dict__['childEntity'] = [datastore_2]
     datastore_2_folder.__dict__['name'] = 'datastore2-folder'
 
-    data_center_1 = mock.Mock()
+    data_center_1 = mock.Mock(spec=vim.Datacenter)
     data_center_1.name = 'dc-1'
-    data_center_1.hostFolder.childEntity = [folder_1, folder_2, folder_5]
-    data_center_1.datastoreFolder.childEntity = [datastore_1, datastore_2_folder]
+    data_center_1_hostfolder = mock.Mock(spec=vim.Folder)
+    data_center_1_hostfolder.childEntity = [folder_1, folder_2, folder_5]
+    data_center_1.hostFolder = data_center_1_hostfolder
 
-    content.rootFolder.childEntity = [data_center_1]
+    dc1_datastoreFolder = mock.Mock(spec=vim.Folder)
+    dc1_datastoreFolder.childEntity = [datastore_1, datastore_2_folder]
+
+    data_center_1.datastoreFolder = dc1_datastoreFolder
+
+    rootFolder1 = mock.Mock(spec=vim.Folder)
+    rootFolder1.childEntity = [data_center_1]
+    content.rootFolder = rootFolder1
 
     collect_only = {
         'vms': True,
@@ -897,4 +905,4 @@ def test_config_env_multiple_sections():
 
 def test_main():
     with pytest.raises(SystemExit):
-        main(['-h'])
+        main(['-h', '-l debug'])

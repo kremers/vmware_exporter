@@ -370,7 +370,7 @@ class VmwareCollector():
     @defer.inlineCallbacks
     def datastore_labels(self):
 
-        def _collect(node, level=1, dc=None, storagePod="-"):
+        def _collect(node, level=1, dc=None, storagePod=""):
             inventory = {}
             if isinstance(node, vim.Folder) and not isinstance(node, vim.StoragePod):
                 logging.debug(f"[Folder    ] {('-' * level).ljust(7)} {node.name}")
